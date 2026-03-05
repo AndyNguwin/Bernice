@@ -36,6 +36,9 @@ async def drop_handler(payload, repository: PostgresRepository):
                     "description": f"Rolled by <@{user_id}>",
                     "image": {
                         "url": idol.image_url
+                    },
+                    "footer": {
+                        "text": f"Code {card_id} • Print {print_number}"
                     }
                 }
             ]
