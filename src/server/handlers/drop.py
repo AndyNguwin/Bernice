@@ -27,6 +27,13 @@ async def drop_handler(payload, repository: PostgresRepository):
     return {
         "type": 4,
         "data": {
-            "content": f"<@{user_id}> pulled:\n **{idol.idol_name}**"
+            "content": f"<@{user_id}> pulled:\n **{idol.idol_name}**",
+            "embeds": [
+                {
+                    "image": {
+                        "url": idol.image_url
+                    }
+                }
+            ]
         }
     }
