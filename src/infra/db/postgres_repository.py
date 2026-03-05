@@ -43,14 +43,25 @@ class PostgresRepository:
             out.append(ALPHABET[r])
         return "".join(out)  # little-endian: index0 cycles first
 
-    async def next_code(self) -> str:
+    async def next_public_code(self) -> str:
         pool = self._check_pool_initialized()
 
         async with pool.acquire() as connection:
             code_count = await connection.fetchval("SELECT nextval('card_code_seq')")
+        
+        PRIME = 1000003
+        ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789"
+        # exclude the confusing characters and nums
 
-            code = self._encode_le_base36(code_count)
-        return code
+        transformed = (code_count * PRIME) ^ (code_count >> 16)
+
+        public_code = ""
+        for i in range(6):
+            char_index = transformed % len(ALPHABET)  # 55 instead of 32
+            public_code = ALPHABET[char_index] + public_code
+            transformed = transformed // len(ALPHABET)  # 55 instead of 32
+        
+        return public_code
 
     async def get_random_idol(self) -> Idol:
         pool = self._check_pool_initialized()
@@ -159,7 +170,7 @@ class PostgresRepository:
             except Exception as e:
                 raise RuntimeError(f"Error while fetching card set for id {card_set_id}", e)
 
-    async def add_card_to_inventory(self, card: Card) -> None:
+    async def add_card_to_inventory(self, card: Card) -> int:
         pool = self._check_pool_initialized()
         
         async with pool.acquire() as connection:
@@ -168,13 +179,16 @@ class PostgresRepository:
                 if not user:
                     await self.add_user(card.owner_id)
 
-                await connection.execute(
+                card_id = await connection.fetchval(
                     """
-                    INSERT INTO card(card_id, idol_id, print_number, owner_id)
+                    INSERT INTO card(public_code, idol_id, print_number, owner_id)
                     VALUES ($1, $2, $3, $4)
+                    RETURNING card_id
                     """,
-                    card.card_id, card.idol_id, card.print_number, card.owner_id
+                    card.public_code, card.idol_id, card.print_number, card.owner_id
                 )
+
+                return card_id
             except Exception as e:
                 raise RuntimeError("Error while adding card to inventory", e)
 

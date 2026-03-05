@@ -3,7 +3,8 @@ from datetime import datetime
 
 @dataclass(frozen=True)
 class Card:
-    card_id: str
+    card_id: int
+    public_code: str
     idol_id: int
     print_number: int
     owner_id: int
