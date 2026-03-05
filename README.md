@@ -162,10 +162,11 @@ For local development with direct Python execution instead of Docker:
    source env/bin/activate
    ```
 
-2. **Install dependencies**
+2. **Install project in development mode**
    ```sh
-   pip install -r requirements.txt
+   pip install -e .
    ```
+   This installs your project as a proper Python package, enabling clean absolute imports like `from bernice.server.main import app`.
 
 3. **Start only the database with Docker**
    ```sh
@@ -173,12 +174,26 @@ For local development with direct Python execution instead of Docker:
    ```
    This runs PostgreSQL on port 5433 with automatic table and data initialization.
 
-4. **Run the bot directly**
+4. **Run the FastAPI server**
+   ```sh
+   uvicorn src.server.main:app --reload
+   ```
+   Or run the Discord bot:
    ```sh
    python src/bot/bot.py
    ```
 
-5. **Invite the bot to your Discord server**
+5. **Test FastAPI locally with ngrok (for Discord interactions)**
+   ```sh
+   # In a new terminal, install and run ngrok
+   npm install -g ngrok
+   ngrok http 8000
+   ```
+   - Copy the generated ngrok URL (e.g., `https://abc123.ngrok.io`)
+   - Update your Discord Developer Portal with this URL as the Interactions Endpoint
+   - Use this URL for testing Discord slash commands locally
+
+6. **Invite the bot to your Discord server**
    - Follow the same steps as above for inviting the bot to your server
 
 **Note**: When using local development, ensure your `.env` file has the correct database URL pointing to the Docker database (`postgresql://devuser:devpass@localhost:5433/devdb`).

@@ -1,6 +1,27 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from .routes.interactions import router as interactions_router
+from server.routers import interactions
+from infra.db.postgres_repository import PostgresRepository
 
-app = FastAPI()
+# repository: PostgresRepository
 
-app.include_router(interactions_router)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # 1 repository handling the connection pool instead of making connections on request
+    # global repository
+    repository = PostgresRepository()
+    await repository._make_connection_pool()
+    app.state.repository = repository
+    print("Database connection pool initialized")
+
+    yield # app is running
+
+    # Cleanup
+    if repository._connection_pool:
+        await repository._connection_pool.close()
+        print("Database connection pool closed")
+
+app = FastAPI(lifespan=lifespan)
+# app.state.repository = repository
+
+app.include_router(interactions.router)
