@@ -14,6 +14,8 @@ async def drop_handler(payload, repository: PostgresRepository):
     idol = await repository.get_random_idol()
     print_number = await repository.allocate_print(idol.idol_id)
     card_id = await repository.next_code()
+    artist = await repository.get_artist_by_id(idol.artist_id)
+    card_set = await repository.get_card_set_by_id(idol.card_set_id)
     
     card = Card(
         card_id = card_id,
@@ -27,9 +29,11 @@ async def drop_handler(payload, repository: PostgresRepository):
     return {
         "type": 4,
         "data": {
-            "content": f"<@{user_id}> pulled:\n **{idol.idol_name}**",
+            # "content": f"<@{user_id}> pulled:\n **{idol.idol_name}**",
             "embeds": [
                 {
+                    "title": f"{idol.idol_name} — {artist} [{card_set}]",
+                    "description": f"Rolled by <@{user_id}>",
                     "image": {
                         "url": idol.image_url
                     }
