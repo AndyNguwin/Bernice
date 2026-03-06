@@ -24,19 +24,19 @@ async def interactions(request: Request):
         if command == "drop":
             return await drop_handler(payload, repository)
         elif command == "inventory":
-            return await inventory_handler(payload, repository, 1, 4)
-
+            return await inventory_handler(payload, repository, owner_id=None, page=1, response_type=4)
+        
     elif interaction_type == 3: # Component clicks (like buttons)
         custom_id = payload["data"]["custom_id"]
         parts = custom_id.split(":")
-        scope, user, action, current_page = parts
+        scope, owner_id, action, current_page = parts
 
         if scope == "inventory":
             page = int(current_page)
             if action == "prev":
-                return await inventory_handler(payload, repository, page=page - 1, response_type=7)
+                return await inventory_handler(payload, repository, owner_id=int(owner_id), page=page - 1, response_type=7)
             else:
-                return await inventory_handler(payload, repository, page=page + 1, response_type=7)
+                return await inventory_handler(payload, repository, owner_id=int(owner_id), page=page + 1, response_type=7)
 
     elif interaction_type == 5: # modal/forms
         pass
