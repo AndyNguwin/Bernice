@@ -17,12 +17,13 @@ async def interactions(request: Request):
     payload = await request.json()
     repository = request.app.state.repository
 
+    user_id = int(payload["member"]["user"]["id"])
     interaction_type = payload["type"]
+    
     if interaction_type == 1: # PING
         return {"type" : 1}
     elif interaction_type == 2: # Slash commands
         command = payload["data"]["name"]
-        user_id = int(payload["member"]["user"]["id"])
 
         if command == "drop":
             return await drop_handler(user_id, repository)
@@ -43,12 +44,12 @@ async def interactions(request: Request):
             scope, owner_id, action, page = parts
             page = int(page)
             if action == "prev":
-                return await inventory_handler(payload, repository, owner_id=int(owner_id), page=page - 1, response_type=7)
+                return await inventory_handler(user_id, repository, owner_id=int(owner_id), page=page - 1, response_type=7)
             else:
-                return await inventory_handler(payload, repository, owner_id=int(owner_id), page=page + 1, response_type=7)
+                return await inventory_handler(user_id, repository, owner_id=int(owner_id), page=page + 1, response_type=7)
 
         if scope == "status":
-            return await status_handler(payload, response_type=7)
+            return await status_handler(user_id, response_type=7)
             
     elif interaction_type == 5: # modal/forms
         pass
