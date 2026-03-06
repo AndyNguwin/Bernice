@@ -23,6 +23,19 @@ commands = [
         "description": "View your inventory of photocards"
     },
     {
+        "name": "view",
+        "type": 1,
+        "description": "View your a card with using a card's code.",
+        "options": [
+            {
+                "type": 3,
+                "name": "code",
+                "description": "6-character code of card",
+                "required": True
+            }
+        ]
+    },
+    {
         "name": "status",
         "type": 1,
         "description": "Change bot status [CREATOR ONLY COMMAND]"

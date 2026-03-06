@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request
 from server.security.discord_verify import verify_discord_signature
 from server.handlers.drop import drop_handler
 from server.handlers.inventory import inventory_handler
+from src.server.handlers.view import view_handler
 from src.server.routers.status import status_handler
 
 router = APIRouter()
@@ -21,11 +22,15 @@ async def interactions(request: Request):
         return {"type" : 1}
     elif interaction_type == 2: # Slash commands
         command = payload["data"]["name"]
+        user_id = int(payload["member"]["user"]["id"])
 
         if command == "drop":
             return await drop_handler(payload, repository)
         elif command == "inventory":
             return await inventory_handler(payload, repository, owner_id=None, page=1, response_type=4)
+        elif command == "view":
+            public_code = payload["data"]["options"][0]["value"]
+            return await view_handler(user_id, public_code, repository)
         elif command == "status":
             return await status_handler(payload, response_type=4)
         

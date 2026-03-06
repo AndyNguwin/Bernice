@@ -172,8 +172,39 @@ class PostgresRepository:
             except Exception as e:
                 raise RuntimeError("Error while checking inventory", e)
     
-    async def get_card_by_id(self, card_id: int) -> Optional[Card]:
-        pass
+    async def get_card_by_public_code(self, public_code: str) -> Optional[InventoryCard]:
+        pool = self._check_pool_initialized()
+
+        async with pool.acquire() as connection:
+            try:
+                row = await connection.fetchrow(
+                    """
+                    SELECT c.public_code, i.idol_name, a.artist_name, cs.card_set_name, c.print_number, c.owner_id, c.acquired_date, i.image_url
+                    FROM card c
+                    JOIN idol i ON c.idol_id = i.idol_id
+                    JOIN artist a ON i.artist_id = a.artist_id
+                    JOIN card_set cs ON i.card_set_id = cs.card_set_id
+                    WHERE public_code = $1
+                    """,
+                    public_code,
+                )
+
+                if row:
+                    return InventoryCard(
+                        public_code = row["public_code"],
+                        idol_name = row["idol_name"],
+                        artist_name = row["artist_name"],
+                        card_set = row["card_set_name"],
+                        print_number = row["print_number"],
+                        owner_id = row["owner_id"],
+                        acquired_date = row["acquired_date"],
+                        image_url = row["image_url"]
+                    )
+                else:
+                    return None
+            except Exception as e:
+                raise RuntimeError("Error while viewing a card", e)
+
     
     async def get_artist_by_id(self, artist_id: int) -> str:
         pool = self._check_pool_initialized()

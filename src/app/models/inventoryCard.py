@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from typing import Optional
+from datetime import datetime
 
 @dataclass(frozen=True)
 class InventoryCard:
@@ -7,3 +9,6 @@ class InventoryCard:
     artist_name: str
     card_set: str 
     print_number: int
+    owner_id: Optional[int] = None
+    acquired_date: Optional[datetime] = None
+    image_url: Optional[str] = None
