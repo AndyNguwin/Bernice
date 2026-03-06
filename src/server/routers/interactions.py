@@ -25,7 +25,7 @@ async def interactions(request: Request):
         user_id = int(payload["member"]["user"]["id"])
 
         if command == "drop":
-            return await drop_handler(payload, repository)
+            return await drop_handler(user_id, repository)
         elif command == "inventory":
             return await inventory_handler(payload, repository, owner_id=None, page=1, response_type=4)
         elif command == "view":
