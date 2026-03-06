@@ -1,7 +1,7 @@
 from src.infra.db.postgres_repository import PostgresRepository
 from src.app.models.inventoryCard import InventoryCard
 
-async def view_handler(user_id:int , public_code:str, repository: PostgresRepository):
+async def view_handler(user_id:int , repository: PostgresRepository, public_code:str):
     card: InventoryCard = await repository.get_card_by_public_code(public_code)
 
     return {

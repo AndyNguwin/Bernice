@@ -1,10 +1,8 @@
-async def status_handler(payload, response_type=4):
+async def status_handler(user_id: int, response_type=4):
     # Response 4: new message
     # Response 7: edit message
 
     creator_id = 152994401612726272
-    
-    user_id = int(payload["member"]["user"]["id"])
 
     if user_id != creator_id:
         return {

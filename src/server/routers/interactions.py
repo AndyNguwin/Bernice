@@ -27,12 +27,12 @@ async def interactions(request: Request):
         if command == "drop":
             return await drop_handler(user_id, repository)
         elif command == "inventory":
-            return await inventory_handler(payload, repository, owner_id=None, page=1, response_type=4)
+            return await inventory_handler(user_id, repository, owner_id=None, page=1, response_type=4)
         elif command == "view":
             public_code = payload["data"]["options"][0]["value"]
-            return await view_handler(user_id, public_code, repository)
+            return await view_handler(user_id, repository, public_code)
         elif command == "status":
-            return await status_handler(payload, response_type=4)
+            return await status_handler(user_id, response_type=4)
         
     elif interaction_type == 3: # Component clicks (like buttons)
         custom_id = payload["data"]["custom_id"]
