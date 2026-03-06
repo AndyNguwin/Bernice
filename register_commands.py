@@ -21,6 +21,11 @@ commands = [
         "name": "inventory",
         "type": 1,
         "description": "View your inventory of photocards"
+    },
+    {
+        "name": "status",
+        "type": 1,
+        "description": "Change bot status [CREATOR ONLY COMMAND]"
     }
 ]
 

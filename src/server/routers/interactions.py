@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request
 from server.security.discord_verify import verify_discord_signature
 from server.handlers.drop import drop_handler
 from server.handlers.inventory import inventory_handler
+from src.server.routers.status import status_handler
 
 router = APIRouter()
 
@@ -25,19 +26,25 @@ async def interactions(request: Request):
             return await drop_handler(payload, repository)
         elif command == "inventory":
             return await inventory_handler(payload, repository, owner_id=None, page=1, response_type=4)
+        elif command == "status":
+            return await status_handler(payload, response_type=4)
         
     elif interaction_type == 3: # Component clicks (like buttons)
         custom_id = payload["data"]["custom_id"]
         parts = custom_id.split(":")
-        scope, owner_id, action, current_page = parts
+        scope = parts[0]
 
         if scope == "inventory":
-            page = int(current_page)
+            scope, owner_id, action, page = parts
+            page = int(page)
             if action == "prev":
                 return await inventory_handler(payload, repository, owner_id=int(owner_id), page=page - 1, response_type=7)
             else:
                 return await inventory_handler(payload, repository, owner_id=int(owner_id), page=page + 1, response_type=7)
 
+        if scope == "status":
+            return await status_handler(payload, response_type=7)
+            
     elif interaction_type == 5: # modal/forms
         pass
 
