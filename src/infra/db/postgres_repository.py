@@ -135,11 +135,20 @@ class PostgresRepository:
             except Exception as e:
                 raise RuntimeError("Error while finding user", e)
 
-    async def get_user_inventory(self, user_id: int, page_num: int = 1) -> List[InventoryCard]:
+    async def get_user_inventory(self, user_id: int, page_num: int = 1) -> Tuple[List[InventoryCard], int]:
         pool = self._check_pool_initialized()
 
         async with pool.acquire() as connection:
             try:
+                inventory_count = await connection.fetchval(
+                    """
+                    SELECT COUNT(*)
+                    FROM card c
+                    WHERE owner_id = $1
+                    """,
+                    user_id
+                )
+                
                 inventory_rows = await connection.fetch(
                     """
                     SELECT c.public_code, i.idol_name, a.artist_name, cs.card_set_name, c.print_number  
@@ -166,7 +175,7 @@ class PostgresRepository:
                     )
                     inventory_cards.append(card)
                 
-                return inventory_cards
+                return (inventory_cards, inventory_count)
 
 
             except Exception as e:
