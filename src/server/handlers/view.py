@@ -11,7 +11,7 @@ async def view_handler(user_id:int , repository: PostgresRepository, public_code
         `Set Name:` {card.card_set}
         `Print #:` {card.print_number}
         `Owner:` <@{card.owner_id}>
-        `Obtained:` {card.acquired_date.strftime("%b %d, %Y • %I:%M %p")}
+        `Obtained:` {card.acquired_date.strftime("%b %d, %Y")}
     """
 
     return {
