@@ -17,7 +17,6 @@ async def inventory_handler(payload, repository):
     return {
         "type": 4,
         "data": {
-            # "content": f"<@{user_id}> pulled:\n **{idol.idol_name}**",
             "embeds": [
                 {
                     "description" : inventory_text
