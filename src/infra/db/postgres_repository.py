@@ -148,7 +148,7 @@ class PostgresRepository:
                     JOIN artist a ON i.artist_id = a.artist_id
                     JOIN card_set cs ON i.card_set_id = cs.card_set_id
                     WHERE owner_id = $1
-                    ORDER BY card_id ASC
+                    ORDER BY card_id DESC
                     LIMIT 10 OFFSET $2
                     """,
                     user_id,
