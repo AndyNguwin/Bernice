@@ -5,12 +5,6 @@ from datetime import datetime
 async def drop_handler(payload, repository: PostgresRepository):
     user_id = int(payload["member"]["user"]["id"])
 
-    # Get random card logic
-    # service layer
-
-    # Placeholder
-    # card_name = "NewJeans - Hanni (Common)"
-
     idol = await repository.get_random_idol()
     print_number = await repository.allocate_print(idol.idol_id)
     public_code = await repository.next_public_code()
