@@ -5,6 +5,7 @@ import asyncpg
 from app.models.idol import Idol
 from app.models.card import Card
 from app.models.user import User
+from app.models.inventoryCard import InventoryCard
 
 load_dotenv()
 CONNECTION_STR = os.getenv("DATABASE_URL")
@@ -134,8 +135,42 @@ class PostgresRepository:
             except Exception as e:
                 raise RuntimeError("Error while finding user", e)
 
-    async def get_user_inventory(self, user_id: int) -> List[Card]:
-        pass
+    async def get_user_inventory(self, user_id: int, page_num: int = 1) -> List[InventoryCard]:
+        pool = self._check_pool_initialized()
+
+        async with pool.acquire() as connection:
+            try:
+                inventory_rows = await connection.fetch(
+                    """
+                    SELECT c.public_code, i.idol_name, a.artist_name, cs.card_set_name, c.print_number  
+                    FROM card c
+                    JOIN idol i ON c.idol_id = i.idol_id
+                    JOIN artist a ON i.artist_id = a.artist_id
+                    JOIN card_set cs ON i.card_set_id = cs.card_set_id
+                    WHERE owner_id = $1
+                    ORDER BY card_id ASC
+                    LIMIT 10 OFFSET $2
+                    """,
+                    user_id,
+                    (page_num - 1) * 10
+                )
+
+                inventory_cards = []
+                for row in inventory_rows:
+                    card = InventoryCard(
+                        public_code = row["public_code"],
+                        idol_name = row["idol_name"],
+                        artist_name = row["artist_name"],
+                        card_set = row["card_set_name"],
+                        print_number = row["print_number"]
+                    )
+                    inventory_cards.append(card)
+                
+                return inventory_cards
+
+
+            except Exception as e:
+                raise RuntimeError("Error while checking inventory", e)
     
     async def get_card_by_id(self, card_id: int) -> Optional[Card]:
         pass

@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Request
 from server.security.discord_verify import verify_discord_signature
 from server.handlers.drop import drop_handler
+from server.handlers.inventory import inventory_handler
 
 router = APIRouter()
 
@@ -22,6 +23,8 @@ async def interactions(request: Request):
 
         if command == "drop":
             return await drop_handler(payload, repository)
+        elif command == "inventory":
+            return await inventory_handler(payload, repository)
     elif interaction_type == 3: # Button clicks
         pass
     elif interaction_type == 5: # modal/forms
