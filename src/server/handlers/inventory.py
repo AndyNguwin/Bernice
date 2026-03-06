@@ -1,10 +1,12 @@
 from src.infra.db.postgres_repository import PostgresRepository
 from src.app.models.inventoryCard import InventoryCard
 
-async def inventory_handler(payload, repository):
+async def inventory_handler(payload, repository, page=1, response_type=4):
+    # Response 4: new message
+    # Response 7: edit message
     user_id = int(payload["member"]["user"]["id"])
 
-    inventory_cards = await repository.get_user_inventory(user_id, 1)
+    inventory_cards = await repository.get_user_inventory(user_id, page)
 
     inventory_text_list = []
     for card in inventory_cards:
@@ -15,11 +17,34 @@ async def inventory_handler(payload, repository):
     inventory_text = "\n\n".join(inventory_text_list)
 
     return {
-        "type": 4,
+        "type": response_type,
         "data": {
+            "content": f"<@{user_id}>'s Inventory",
             "embeds": [
                 {
+                    "title" : "Inventory",
                     "description" : inventory_text
+                }
+            ],
+            "components": [
+                {
+                    "type": 1,
+                    "components": [
+                        {
+                            "type": 2,
+                            "style": 2,
+                            "label": "Previous",
+                            "custom_id": f"inventory:{user_id}:prev:{page}",
+                            "disabled": page <= 1
+                        },
+                        {
+                            "type": 2,
+                            "style": 2,
+                            "label": "Next",
+                            "custom_id": f"inventory:{user_id}:next:{page}",
+                            "disabled": len(inventory_text_list) < 10
+                        }
+                    ]
                 }
             ]
         }
