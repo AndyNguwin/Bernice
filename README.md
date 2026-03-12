@@ -86,6 +86,20 @@ python register_commands.py
 - **`/view code:<public_code>`**: view a specific card by code
 - **`/status`**: creator-only (toggles status response)
 
+### Deploy (Render)
+
+**Start command:**
+
+```bash
+uvicorn server.main:app --host 0.0.0.0 --port $PORT
+```
+
+**Test locally (prod-like bind):**
+
+```bash
+python -m uvicorn server.main:app --host 0.0.0.0 --port 8000
+```
+
 ### Troubleshooting
 
 #### `ModuleNotFoundError: No module named 'server'`
