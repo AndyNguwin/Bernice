@@ -14,7 +14,7 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgresql://devuser:devpass@db:5432/bernice_dev
+      DATABASE_URL: ${DATABASE_URL_DOCKER}
     depends_on:
       - db
     ports:
