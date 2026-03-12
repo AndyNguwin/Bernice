@@ -35,7 +35,11 @@ CREATE TABLE IF NOT EXISTS idol (
 
 -- Create CARD table (depends on USER and IDOL)
 CREATE TABLE IF NOT EXISTS card (
-    card_id VARCHAR(10) PRIMARY KEY,
+    card_id BIGSERIAL PRIMARY KEY,
+    public_code VARCHAR(6) NOT NULL UNIQUE,
+    CONSTRAINT card_instance_public_code_format
+        CHECK (public_code ~ '^[A-HJ-NP-Za-hj-np-z2-9]{6}$'),
+
     idol_id INTEGER NOT NULL,
     print_number INTEGER NOT NULL,
     owner_id BIGINT NOT NULL,
@@ -46,3 +50,4 @@ CREATE TABLE IF NOT EXISTS card (
 
 -- Create indexes for better query performance
 CREATE INDEX IF NOT EXISTS idx_card_discord_id ON card(owner_id);
+CREATE INDEX IF NOT EXISTS idx_card_public_code ON card(public_code);
