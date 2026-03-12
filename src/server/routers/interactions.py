@@ -23,11 +23,6 @@ async def interactions(request: Request):
     repository = request.app.state.repository
 
     try:
-        user_id = int(payload["member"]["user"]["id"])
-    except (KeyError, TypeError, ValueError):
-        raise HTTPException(400, "Missing/invalid field: member.user.id")
-
-    try:
         interaction_type = payload["type"]
     except (KeyError, TypeError):
         raise HTTPException(400, "Missing field: type")
@@ -35,7 +30,13 @@ async def interactions(request: Request):
 
     if interaction_type == 1: # PING
         return {"type" : 1}
-    elif interaction_type == 2: # Slash commands
+    
+    try:
+        user_id = int(payload["member"]["user"]["id"])
+    except (KeyError, TypeError, ValueError):
+        raise HTTPException(400, "Missing/invalid field: member.user.id")
+        
+    if interaction_type == 2: # Slash commands
         try:
             command = payload["data"]["name"]
         except (KeyError, TypeError):
