@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from server.routers import interactions
+from server.routers import health, interactions
 from infra.db.postgres_repository import PostgresRepository
 
 # repository: PostgresRepository
@@ -25,3 +25,4 @@ app = FastAPI(lifespan=lifespan)
 # app.state.repository = repository
 
 app.include_router(interactions.router)
+app.include_router(health.router)
