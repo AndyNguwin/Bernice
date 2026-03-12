@@ -1,6 +1,6 @@
 import math
-from src.infra.db.postgres_repository import PostgresRepository
-from src.app.models.inventoryCard import InventoryCard
+from infra.db.postgres_repository import PostgresRepository
+from app.models.inventoryCard import InventoryCard
 
 async def inventory_handler(user_id: int, repository: PostgresRepository, owner_id=None, page=1, response_type=4):
     # Response 4: new message

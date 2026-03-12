@@ -1,5 +1,5 @@
-from src.infra.db.postgres_repository import PostgresRepository
-from src.app.models.card import Card
+from infra.db.postgres_repository import PostgresRepository
+from app.models.card import Card
 from datetime import datetime
 
 async def drop_handler(user_id: int, repository: PostgresRepository):

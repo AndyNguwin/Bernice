@@ -2,8 +2,8 @@ from fastapi import APIRouter, Request
 from server.security.discord_verify import verify_discord_signature
 from server.handlers.drop import drop_handler
 from server.handlers.inventory import inventory_handler
-from src.server.handlers.view import view_handler
-from src.server.handlers.status import status_handler
+from server.handlers.view import view_handler
+from server.handlers.status import status_handler
 
 router = APIRouter()
 

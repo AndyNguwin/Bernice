@@ -1,5 +1,5 @@
-from src.infra.db.postgres_repository import PostgresRepository
-from src.app.models.inventoryCard import InventoryCard
+from infra.db.postgres_repository import PostgresRepository
+from app.models.inventoryCard import InventoryCard
 from datetime import datetime
 
 async def view_handler(user_id:int , repository: PostgresRepository, public_code:str):
