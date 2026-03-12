@@ -86,6 +86,19 @@ python register_commands.py
 - **`/view code:<public_code>`**: view a specific card by code
 - **`/status`**: creator-only (toggles status response)
 
+### Future refactor: move handler logic into `app/services`
+
+Today, `src/server/handlers/` contains both:
+
+- the **use-case logic** (drop a card, fetch inventory, view a card), and
+- the **Discord response formatting** (returning the interaction JSON shape).
+
+A future cleanup is to move the use-case logic into **`src/app/services/`** (transport-agnostic functions that return plain Python data), and keep `src/server/handlers/` as a thin adapter layer that:
+
+- parses the interaction payload
+- calls `app/services/*`
+- formats the result into Discord’s expected response shape (`type`, `data`, `embeds`, `components`)
+
 ### Deploy (Render)
 
 **Start command:**
