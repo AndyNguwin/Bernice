@@ -44,27 +44,22 @@ pip install -e .
 
 **Why `pip install -e .`?** It makes `server`, `app`, and `infra` importable without needing `src.` prefixes or setting `PYTHONPATH`.
 
-### Run local dev
+### Run local dev (Docker: app + db)
 
-#### 1) Start Postgres (Docker)
-
-```bash
-docker-compose up -d db
-```
-
-#### 2) Start the FastAPI server
+From the repo root:
 
 ```bash
-python -m uvicorn server.main:app --reload --port 8000
+docker compose up --build
 ```
-or
-```bash
-uvicorn server.main:app --reload --port 8000
-```
+
+This starts:
+
+- **`db`** (Postgres) on `localhost:5433` (for tools like pgAdmin)
+- **`app`** (FastAPI) on `http://localhost:8000`
 
 Open `http://localhost:8000/docs` to confirm it booted.
 
-#### 3) Expose localhost to Discord (ngrok)
+#### Expose localhost to Discord (ngrok)
 Typically have to use a git bash terminal
 ```bash
 ngrok http 8000

@@ -12,12 +12,13 @@ setup(
         "uvicorn[standard]>=0.24.0",
         "asyncpg>=0.29.0",
         "python-dotenv>=1.0.0",
-        # Add other dependencies from requirements.txt
+        "PyNaCl>=1.5.0",
+        "requests>=2.0.0",
     ],
     python_requires=">=3.8",
-    entry_points={
-        "console_scripts": [
-            "bernice=src.server.main:main",
-        ],
-    },
+    # entry_points={
+    #     "console_scripts": [
+    #         "bernice=src.server.main:main",
+    #     ],
+    # },
 )
