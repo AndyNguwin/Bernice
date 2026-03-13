@@ -14,6 +14,7 @@ setup(
         "python-dotenv>=1.0.0",
         "PyNaCl>=1.5.0",
         "requests>=2.0.0",
+        "httpx>=0.27.0"
     ],
     python_requires=">=3.8",
     # entry_points={
