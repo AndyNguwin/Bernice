@@ -6,6 +6,7 @@ async def drop_handler(application_id: str, interaction_token: str, user_id: int
     drop_result = await drop_card(user_id, repository=repository)
 
     content = {
+        "content": f"<@{user_id}>",
         "embeds": [
             {
                 "title": f"{drop_result.idol_name} — {drop_result.artist_name} [{drop_result.card_set}]",
