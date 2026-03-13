@@ -1,7 +1,7 @@
 import json
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
 from server.security.discord_verify import verify_discord_signature
-from server.handlers.drop import drop_handler
+from server.handlers.drop_handler import drop_handler
 from server.handlers.inventory import inventory_handler
 from server.handlers.view import view_handler
 from server.handlers.status import status_handler
@@ -40,12 +40,19 @@ async def interactions(request: Request, background_tasks: BackgroundTasks):
         try:
             command = payload["data"]["name"]
             application_id = payload["application_id"]
-            token = payload["token"]
+            interaction_token = payload["token"]
         except (KeyError, TypeError):
             raise HTTPException(400, "Missing field: payload['data']['name']")
 
         if command == "drop":
-            return await drop_handler(user_id, repository)
+            # return await drop_handler(user_id, repository)
+            background_tasks.add_task(
+                drop_handler,
+                application_id,
+                interaction_token,
+                user_id,
+                repository
+            )
         elif command == "inventory":
             return await inventory_handler(user_id, repository, owner_id=None, page=1, response_type=4)
         elif command == "view":
@@ -56,6 +63,8 @@ async def interactions(request: Request, background_tasks: BackgroundTasks):
                 raise HTTPException(400, "Missing field: options[0].value")
         elif command == "status":
             return await status_handler(user_id, response_type=4)
+        
+        return {"type": 5}
         
     elif interaction_type == 3: # Component clicks (like buttons)
         try:
