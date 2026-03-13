@@ -1,5 +1,5 @@
 import json
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
 from server.security.discord_verify import verify_discord_signature
 from server.handlers.drop import drop_handler
 from server.handlers.inventory import inventory_handler
@@ -9,7 +9,7 @@ from server.handlers.status import status_handler
 router = APIRouter()
 
 @router.post("/interactions")
-async def interactions(request: Request):
+async def interactions(request: Request, background_tasks: BackgroundTasks):
     print("Interactions reached")
     body = await request.body()
 
@@ -39,6 +39,8 @@ async def interactions(request: Request):
     if interaction_type == 2: # Slash commands
         try:
             command = payload["data"]["name"]
+            application_id = payload["application_id"]
+            token = payload["token"]
         except (KeyError, TypeError):
             raise HTTPException(400, "Missing field: payload['data']['name']")
 
