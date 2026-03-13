@@ -2,7 +2,7 @@ import json
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
 from server.security.discord_verify import verify_discord_signature
 from server.handlers.drop_handler import drop_handler
-from server.handlers.inventory import inventory_handler
+from server.handlers.inventory_handler import inventory_handler
 from server.handlers.view_handler import view_handler
 from server.handlers.status import status_handler
 
@@ -35,12 +35,16 @@ async def interactions(request: Request, background_tasks: BackgroundTasks):
         user_id = int(payload["member"]["user"]["id"])
     except (KeyError, TypeError, ValueError):
         raise HTTPException(400, "Missing/invalid field: member.user.id")
-        
+    
+    try:
+        application_id = payload["application_id"]
+        interaction_token = payload["token"]
+    except (KeyError, TypeError, ValueError):
+        raise HTTPException(400, "Missing/invalid field: payload['application_id] or payload['token']")
+
     if interaction_type == 2: # Slash commands
         try:
             command = payload["data"]["name"]
-            application_id = payload["application_id"]
-            interaction_token = payload["token"]
         except (KeyError, TypeError):
             raise HTTPException(400, "Missing field: payload['data']['name']")
 
@@ -54,7 +58,16 @@ async def interactions(request: Request, background_tasks: BackgroundTasks):
                 repository
             )
         elif command == "inventory":
-            return await inventory_handler(user_id, repository, owner_id=None, page=1, response_type=4)
+            background_tasks.add_task(
+                inventory_handler,
+                application_id,
+                interaction_token,
+                user_id,
+                repository,
+                owner_id=None,
+                page=1,
+                response_type=4
+            )
         elif command == "view":
             try:
                 public_code = payload["data"]["options"][0]["value"]
@@ -90,14 +103,36 @@ async def interactions(request: Request, background_tasks: BackgroundTasks):
                 raise HTTPException(400, "Invalid inventory custom_id format")
 
             if action == "prev":
-                return await inventory_handler(user_id, repository, owner_id=int(owner_id), page=page - 1, response_type=7)
+                background_tasks.add_task(
+                    inventory_handler,
+                    application_id,
+                    interaction_token,
+                    user_id,
+                    repository,
+                    owner_id=int(owner_id),
+                    page=page - 1,
+                    response_type=7
+                )
+                # return await inventory_handler(user_id, repository, owner_id=int(owner_id), page=page - 1, response_type=7)
             elif action == "next":
-                return await inventory_handler(user_id, repository, owner_id=int(owner_id), page=page + 1, response_type=7)
+                background_tasks.add_task(
+                    inventory_handler,
+                    application_id,
+                    interaction_token,
+                    user_id,
+                    repository,
+                    owner_id=int(owner_id),
+                    page=page + 1,
+                    response_type=7
+                )
+                # return await inventory_handler(user_id, repository, owner_id=int(owner_id), page=page + 1, response_type=7)
             else:
                 raise HTTPException(400, "Invalid inventory action")
+
+            return {"type": 6}
         if scope == "status":
             return await status_handler(user_id, response_type=7)
-            
+        
     elif interaction_type == 5: # modal/forms
         pass
 
