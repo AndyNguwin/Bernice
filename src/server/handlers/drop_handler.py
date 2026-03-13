@@ -1,6 +1,6 @@
 from app.services.drop import drop_card
 from infra.db.postgres_repository import PostgresRepository
-import httpx
+from infra.discord.client import edit_deferred_message
 
 async def drop_handler(application_id: str, interaction_token: str, user_id: int, repository: PostgresRepository):
     drop_result = await drop_card(user_id, repository=repository)
@@ -20,8 +20,4 @@ async def drop_handler(application_id: str, interaction_token: str, user_id: int
         ]
     }
 
-    url = f"https://discord.com/api/v10/webhooks/{application_id}/{interaction_token}/messages/@original"
-    
-    async with httpx.AsyncClient() as client:
-        response = await client.patch(url, json=content)
-        response.raise_for_status()
+    await edit_deferred_message(application_id, interaction_token, content)
