@@ -1,15 +1,15 @@
 import json
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
 from server.security.discord_verify import verify_discord_signature
-from server.handlers.drop import drop_handler
-from server.handlers.inventory import inventory_handler
-from server.handlers.view import view_handler
+from server.handlers.drop_handler import drop_handler
+from server.handlers.inventory_handler import inventory_handler
+from server.handlers.view_handler import view_handler
 from server.handlers.status import status_handler
 
 router = APIRouter()
 
 @router.post("/interactions")
-async def interactions(request: Request):
+async def interactions(request: Request, background_tasks: BackgroundTasks):
     print("Interactions reached")
     body = await request.body()
 
@@ -35,7 +35,13 @@ async def interactions(request: Request):
         user_id = int(payload["member"]["user"]["id"])
     except (KeyError, TypeError, ValueError):
         raise HTTPException(400, "Missing/invalid field: member.user.id")
-        
+    
+    try:
+        application_id = payload["application_id"]
+        interaction_token = payload["token"]
+    except (KeyError, TypeError, ValueError):
+        raise HTTPException(400, "Missing/invalid field: payload['application_id] or payload['token']")
+
     if interaction_type == 2: # Slash commands
         try:
             command = payload["data"]["name"]
@@ -43,17 +49,42 @@ async def interactions(request: Request):
             raise HTTPException(400, "Missing field: payload['data']['name']")
 
         if command == "drop":
-            return await drop_handler(user_id, repository)
+            # return await drop_handler(user_id, repository)
+            background_tasks.add_task(
+                drop_handler,
+                application_id,
+                interaction_token,
+                user_id,
+                repository
+            )
         elif command == "inventory":
-            return await inventory_handler(user_id, repository, owner_id=None, page=1, response_type=4)
+            background_tasks.add_task(
+                inventory_handler,
+                application_id,
+                interaction_token,
+                user_id,
+                repository,
+                owner_id=None,
+                page=1,
+                response_type=4
+            )
         elif command == "view":
             try:
                 public_code = payload["data"]["options"][0]["value"]
-                return await view_handler(user_id, repository, public_code)
+                background_tasks.add_task(
+                    view_handler,
+                    application_id,
+                    interaction_token,
+                    user_id,
+                    repository,
+                    public_code
+                )
             except (KeyError, TypeError, IndexError):
                 raise HTTPException(400, "Missing field: options[0].value")
         elif command == "status":
             return await status_handler(user_id, response_type=4)
+        
+        return {"type": 5}
         
     elif interaction_type == 3: # Component clicks (like buttons)
         try:
@@ -72,14 +103,36 @@ async def interactions(request: Request):
                 raise HTTPException(400, "Invalid inventory custom_id format")
 
             if action == "prev":
-                return await inventory_handler(user_id, repository, owner_id=int(owner_id), page=page - 1, response_type=7)
+                background_tasks.add_task(
+                    inventory_handler,
+                    application_id,
+                    interaction_token,
+                    user_id,
+                    repository,
+                    owner_id=int(owner_id),
+                    page=page - 1,
+                    response_type=7
+                )
+                # return await inventory_handler(user_id, repository, owner_id=int(owner_id), page=page - 1, response_type=7)
             elif action == "next":
-                return await inventory_handler(user_id, repository, owner_id=int(owner_id), page=page + 1, response_type=7)
+                background_tasks.add_task(
+                    inventory_handler,
+                    application_id,
+                    interaction_token,
+                    user_id,
+                    repository,
+                    owner_id=int(owner_id),
+                    page=page + 1,
+                    response_type=7
+                )
+                # return await inventory_handler(user_id, repository, owner_id=int(owner_id), page=page + 1, response_type=7)
             else:
                 raise HTTPException(400, "Invalid inventory action")
+
+            return {"type": 6}
         if scope == "status":
             return await status_handler(user_id, response_type=7)
-            
+        
     elif interaction_type == 5: # modal/forms
         pass
 
