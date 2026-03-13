@@ -3,7 +3,7 @@ from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
 from server.security.discord_verify import verify_discord_signature
 from server.handlers.drop_handler import drop_handler
 from server.handlers.inventory import inventory_handler
-from server.handlers.view import view_handler
+from server.handlers.view_handler import view_handler
 from server.handlers.status import status_handler
 
 router = APIRouter()
@@ -58,7 +58,14 @@ async def interactions(request: Request, background_tasks: BackgroundTasks):
         elif command == "view":
             try:
                 public_code = payload["data"]["options"][0]["value"]
-                return await view_handler(user_id, repository, public_code)
+                background_tasks.add_task(
+                    view_handler,
+                    application_id,
+                    interaction_token,
+                    user_id,
+                    repository,
+                    public_code
+                )
             except (KeyError, TypeError, IndexError):
                 raise HTTPException(400, "Missing field: options[0].value")
         elif command == "status":
