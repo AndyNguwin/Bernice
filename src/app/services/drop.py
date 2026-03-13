@@ -3,7 +3,7 @@ from infra.db.postgres_repository import PostgresRepository
 from app.models.card import Card
 from datetime import datetime
 
-async def drop_card(user_id: int, repository: PostgresRepository):
+async def drop_card(user_id: int, repository: PostgresRepository) -> DropResult:
     idol = await repository.get_random_idol()
     print_number = await repository.allocate_print(idol.idol_id)
     public_code = await repository.next_public_code()
