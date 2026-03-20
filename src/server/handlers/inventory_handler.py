@@ -4,7 +4,16 @@ from infra.db.postgres_repository import PostgresRepository
 from app.models.inventoryCard import InventoryCard
 from infra.discord.client import edit_deferred_message
 
-async def inventory_handler(application_id: str, interaction_token: str, user_id: int, repository: PostgresRepository, owner_id=None, page=1, response_type=4):
+async def inventory_handler(
+    application_id: str,
+    interaction_token: str,
+    user_id: int,
+    repository: PostgresRepository,
+    owner_id=None,
+    page=1,
+    response_type=4,
+    interaction_id: str | None = None,
+):
     # Response 4: new message
     # Response 7: edit message
     if response_type == 7 and owner_id != user_id:
@@ -61,4 +70,14 @@ async def inventory_handler(application_id: str, interaction_token: str, user_id
         ]
     }
 
-    await edit_deferred_message(application_id, interaction_token, content)
+    interaction_name = "inventory_page"
+    if response_type == 4:
+        interaction_name = "inventory"
+
+    await edit_deferred_message(
+        application_id,
+        interaction_token,
+        content,
+        interaction_id=interaction_id,
+        interaction_name=interaction_name,
+    )

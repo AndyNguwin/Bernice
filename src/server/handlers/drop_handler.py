@@ -2,7 +2,13 @@ from app.services.drop import drop_card
 from infra.db.postgres_repository import PostgresRepository
 from infra.discord.client import edit_deferred_message
 
-async def drop_handler(application_id: str, interaction_token: str, user_id: int, repository: PostgresRepository):
+async def drop_handler(
+    application_id: str,
+    interaction_token: str,
+    user_id: int,
+    repository: PostgresRepository,
+    interaction_id: str | None = None,
+):
     drop_result = await drop_card(user_id, repository=repository)
 
     content = {
@@ -21,4 +27,10 @@ async def drop_handler(application_id: str, interaction_token: str, user_id: int
         ]
     }
 
-    await edit_deferred_message(application_id, interaction_token, content)
+    await edit_deferred_message(
+        application_id,
+        interaction_token,
+        content,
+        interaction_id=interaction_id,
+        interaction_name="drop",
+    )

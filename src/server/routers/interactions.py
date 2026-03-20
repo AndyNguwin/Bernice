@@ -26,6 +26,9 @@ async def interactions(request: Request, background_tasks: BackgroundTasks):
         interaction_type = payload["type"]
     except (KeyError, TypeError):
         raise HTTPException(400, "Missing field: type")
+
+    interaction_id = payload.get("id")
+    interaction_name = None
     
 
     if interaction_type == 1: # PING
@@ -45,6 +48,7 @@ async def interactions(request: Request, background_tasks: BackgroundTasks):
     if interaction_type == 2: # Slash commands
         try:
             command = payload["data"]["name"]
+            interaction_name = command
         except (KeyError, TypeError):
             raise HTTPException(400, "Missing field: payload['data']['name']")
 
@@ -55,7 +59,8 @@ async def interactions(request: Request, background_tasks: BackgroundTasks):
                 application_id,
                 interaction_token,
                 user_id,
-                repository
+                repository,
+                interaction_id=interaction_id
             )
         elif command == "inventory":
             background_tasks.add_task(
@@ -66,7 +71,8 @@ async def interactions(request: Request, background_tasks: BackgroundTasks):
                 repository,
                 owner_id=None,
                 page=1,
-                response_type=4
+                response_type=4,
+                interaction_id=interaction_id
             )
         elif command == "view":
             try:
@@ -77,7 +83,8 @@ async def interactions(request: Request, background_tasks: BackgroundTasks):
                     interaction_token,
                     user_id,
                     repository,
-                    public_code
+                    public_code,
+                    interaction_id=interaction_id
                 )
             except (KeyError, TypeError, IndexError):
                 raise HTTPException(400, "Missing field: options[0].value")
@@ -89,6 +96,7 @@ async def interactions(request: Request, background_tasks: BackgroundTasks):
     elif interaction_type == 3: # Component clicks (like buttons)
         try:
             custom_id = payload["data"]["custom_id"]
+            interaction_name = custom_id
         except (KeyError, TypeError):
             raise HTTPException(400, "Missing field: data.custom_id")
 
@@ -111,7 +119,8 @@ async def interactions(request: Request, background_tasks: BackgroundTasks):
                     repository,
                     owner_id=int(owner_id),
                     page=page - 1,
-                    response_type=7
+                    response_type=7,
+                    interaction_id=interaction_id
                 )
                 # return await inventory_handler(user_id, repository, owner_id=int(owner_id), page=page - 1, response_type=7)
             elif action == "next":
@@ -123,7 +132,8 @@ async def interactions(request: Request, background_tasks: BackgroundTasks):
                     repository,
                     owner_id=int(owner_id),
                     page=page + 1,
-                    response_type=7
+                    response_type=7,
+                    interaction_id=interaction_id
                 )
                 # return await inventory_handler(user_id, repository, owner_id=int(owner_id), page=page + 1, response_type=7)
             else:
@@ -135,6 +145,8 @@ async def interactions(request: Request, background_tasks: BackgroundTasks):
         
     elif interaction_type == 5: # modal/forms
         pass
+
+    print(f"Interaction received: id={interaction_id} type={interaction_type} name={interaction_name}")
 
 
     return {"type": 4, "data": {"content": "Unhandled."}}
