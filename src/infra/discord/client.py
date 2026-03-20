@@ -41,5 +41,14 @@ async def edit_deferred_message(
                 response.headers.get("X-RateLimit-Remaining"),
                 response.headers.get("X-RateLimit-Reset-After"),
             )
-
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError:
+            logger.exception(
+                "Discord PATCH failed for interaction_id=%s interaction_name=%s content_type=%s server=%s cf_ray=%s",
+                interaction_id,
+                interaction_name,
+                response.headers.get("Content-Type"),
+                response.headers.get("Server"),
+                response.headers.get("CF-RAY"),
+            )
