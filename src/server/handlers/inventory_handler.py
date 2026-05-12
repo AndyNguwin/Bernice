@@ -1,8 +1,7 @@
-import math
 from app.services.inventory import view_inventory
 from infra.db.postgres_repository import PostgresRepository
-from app.models.inventoryCard import InventoryCard
 from infra.discord.client import edit_deferred_message
+
 
 async def inventory_handler(
     application_id: str,
@@ -25,26 +24,31 @@ async def inventory_handler(
             }
         }
 
-    inventory_cards, inventory_count = await view_inventory(user_id, repository, page=page)
-
-    inventory_text_list = []
-    for card in inventory_cards:
-        inventory_text_list.append(
-            f"`{card.public_code:<6}` **{card.idol_name}** - {card.artist_name}  [{card.card_set}]  #{card.print_number}"
-        )
-
-    inventory_text_list.append(
-        f"**Page {page} / {math.ceil(inventory_count / 10)}**"
+    target_id = owner_id if owner_id is not None else user_id
+    inventory_cards, total_copies, line_count, effective_page = await view_inventory(
+        target_id, repository, page=page
     )
-    
-    inventory_text = "\n\n".join(inventory_text_list)
+
+    page_size = 10
+    total_pages = max(1, (line_count + page_size - 1) // page_size) if line_count else 1
+
+    if not inventory_cards and line_count == 0:
+        inventory_text = "*No cards yet.*"
+    else:
+        lines = []
+        for card in inventory_cards:
+            lines.append(
+                f"`{card.public_code}` · **{card.idol_name}** · {card.artist_name} · **×{card.quantity}**"
+            )
+        lines.append(f"— Page **{effective_page}** / **{total_pages}** —")
+        inventory_text = "\n".join(lines)
 
     content = {
-        "content": f"<@{user_id}>'s Inventory",
+        "content": f"<@{target_id}>'s Inventory",
         "embeds": [
             {
-                "title" : f"Inventory: {inventory_count} total cards",
-                "description" : inventory_text
+                "title": f"Total cards: {total_copies}",
+                "description": inventory_text
             }
         ],
         "components": [
@@ -55,15 +59,15 @@ async def inventory_handler(
                         "type": 2,
                         "style": 2,
                         "label": "Previous",
-                        "custom_id": f"inventory:{user_id}:prev:{page}",
-                        "disabled": page <= 1
+                        "custom_id": f"inventory:{target_id}:prev:{effective_page}",
+                        "disabled": effective_page <= 1
                     },
                     {
                         "type": 2,
                         "style": 2,
                         "label": "Next",
-                        "custom_id": f"inventory:{user_id}:next:{page}",
-                        "disabled": len(inventory_text_list) < 10
+                        "custom_id": f"inventory:{target_id}:next:{effective_page}",
+                        "disabled": effective_page >= total_pages
                     }
                 ]
             }

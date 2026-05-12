@@ -21,7 +21,7 @@ async def drop_handler(
                     "url": drop_result.image_url
                 },
                 "footer": {
-                    "text": f"Code {drop_result.public_code} • Print {drop_result.print_number}"
+                    "text": f"Code {drop_result.public_code} • Total printed {drop_result.total_print_count}"
                 }
             }
         ]
