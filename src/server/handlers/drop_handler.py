@@ -13,12 +13,12 @@ async def drop_handler(
     drop_result = await drop_card(user_id, repository=repository)
 
     content = {
-        "content": f"<@{user_id}'s drop result!>",
+        "content": f"<@{user_id}>'s drop result!",
         "embeds": [
             {
                 "title": f"{drop_result.artist_name} {drop_result.idol_name}",
                 "description": (
-                    f"✦ ``{drop_result.public_code}``\n"
+                    f"✦ **Code**: ``{drop_result.public_code}``\n"
                     f"✦ **Type**: ``{drop_result.card_set}``\n"
                     f"✦ **Rarity**: ``{drop_result.rarity}``\n"
                     f"✦ **In Inventory**: ``{drop_result.quantity}``\n"
