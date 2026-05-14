@@ -66,7 +66,7 @@ class PostgresRepository:
 
         # Temporary fallback while rarities are capped at 3 right now
         if rarity > 3:
-            rarity = random.choice([2, 3])
+            rarity = random.choice([1, 2, 3])
 
         async with pool.acquire() as connection:
             try:
