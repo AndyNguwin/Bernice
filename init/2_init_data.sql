@@ -2,7 +2,8 @@
 INSERT INTO artist (artist_id, artist_name) VALUES
 (1, 'NewJeans'),
 (2, 'LE SSERAFIM'),
-(3, 'ITZY')
+(3, 'ITZY'),
+(4, 'aespa')
 ON CONFLICT (artist_id) DO NOTHING;
 
 -- Initialize card_set data
@@ -26,7 +27,11 @@ INSERT INTO idol (idol_id, idol_name, artist_id) VALUES
 (12, 'Lia', 3),
 (13, 'Ryujin', 3),
 (14, 'Chaeryeong', 3),
-(15, 'Yuna', 3)
+(15, 'Yuna', 3),
+(16, 'Karina', 4),
+(17, 'Giselle', 4),
+(18, 'Winter', 4),
+(19, 'Ningning', 4)
 ON CONFLICT (idol_id) DO NOTHING;
 
 -- Catalog cards: set public_code yourself when adding rows; placeholders below
@@ -60,7 +65,19 @@ INSERT INTO idol_card (idol_card_id, public_code, idol_id, card_set_id, rarity, 
 (27, 'itzCHRY-S1-01', 14, 1, 1, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778554514/itzCHRY-S1-01_xeu1hj.png', 0),
 (28, 'itzYUNA-S3-01', 15, 1, 3, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778554521/itzYUNA-S3-01_u6zti8.png', 0),
 (29, 'itzYUNA-S2-01', 15, 1, 2, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778554522/itzYUNA-S2-01_pkzgfu.png', 0),
-(30, 'itzYUNA-S1-01', 15, 1, 1, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778554521/itzYUNA-S1-01_cqajw8.png', 0)
+(30, 'itzYUNA-S1-01', 15, 1, 1, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778554521/itzYUNA-S1-01_cqajw8.png', 0),
+(31, 'aesKARI-S3-01', 16, 1, 3, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778670307/aesKARI-S3-01_upajzf.png', 0),
+(32, 'aesKARI-S2-01', 16, 1, 2, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778670307/aesKARI-S2-01_anwv9y.png', 0),
+(33, 'aesKARI-S1-01', 16, 1, 1, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778670307/aesKARI-S1-01_ypwqbm.png', 0),
+(34, 'aesGISE-S3-01', 17, 1, 3, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778670307/aesGISE-S3-01_dldedy.png', 0),
+(35, 'aesGISE-S2-01', 17, 1, 2, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778670306/aesGISE-S2-01_iukpbc.png', 0),
+(36, 'aesGISE-S1-01', 17, 1, 1, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778670307/aesGISE-S1-01_zlarjj.png', 0),
+(37, 'aesWINT-S3-01', 18, 1, 3, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778670308/aesWINT-S3-01_cnppl7.png', 0),
+(38, 'aesWINT-S2-01', 18, 1, 2, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778670308/aesWINT-S2-01_ibxww2.png', 0),
+(39, 'aesWINT-S1-01', 18, 1, 1, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778670308/aesWINT-S1-01_aeakst.png', 0),
+(40, 'aesNING-S3-01', 19, 1, 3, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778670308/aesNING-S3-01_qxjkvg.png', 0),
+(41, 'aesNING-S2-01', 19, 1, 2, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778670308/aesNING-S2-01_jblg6d.png', 0),
+(42, 'aesNING-S1-01', 19, 1, 1, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778670307/aesNING-S1-01_oc6b7k.png', 0)
 ON CONFLICT (idol_card_id) DO NOTHING;
 
 -- Keep SERIAL sequences past explicit seed IDs
