@@ -3,7 +3,8 @@ INSERT INTO artist (artist_id, artist_name) VALUES
 (1, 'NewJeans'),
 (2, 'LE SSERAFIM'),
 (3, 'ITZY'),
-(4, 'aespa')
+(4, 'aespa'),
+(5, 'BIGBANG')
 ON CONFLICT (artist_id) DO NOTHING;
 
 -- Initialize card_set data
@@ -31,7 +32,11 @@ INSERT INTO idol (idol_id, idol_name, artist_id) VALUES
 (16, 'Karina', 4),
 (17, 'Giselle', 4),
 (18, 'Winter', 4),
-(19, 'Ningning', 4)
+(19, 'Ningning', 4),
+(20, 'G-DRAGON', 5),
+(21, 'T.O.P', 5),
+(22, 'Taeyang', 5),
+(23, 'Daesung', 5)
 ON CONFLICT (idol_id) DO NOTHING;
 
 -- Catalog cards: set public_code yourself when adding rows; placeholders below
@@ -77,7 +82,15 @@ INSERT INTO idol_card (idol_card_id, public_code, idol_id, card_set_id, rarity, 
 (39, 'aesWINT-S1-01', 18, 1, 1, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778670308/aesWINT-S1-01_aeakst.png', 0),
 (40, 'aesNING-S3-01', 19, 1, 3, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778670308/aesNING-S3-01_qxjkvg.png', 0),
 (41, 'aesNING-S2-01', 19, 1, 2, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778670308/aesNING-S2-01_jblg6d.png', 0),
-(42, 'aesNING-S1-01', 19, 1, 1, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778670307/aesNING-S1-01_oc6b7k.png', 0)
+(42, 'aesNING-S1-01', 19, 1, 1, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778670307/aesNING-S1-01_oc6b7k.png', 0),
+(43, 'bbngGDRA-S2-01', 20, 1, 2, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778749104/bbngGDRA-S2-01_abg6ts.png', 0),
+(44, 'bbngGDRA-S1-01', 20, 1, 1, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778749104/bbngGDRA-S1-01_bttnod.png', 0),
+(45, 'bbngTOP-S2-01', 21, 1, 2, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778749103/bbngTOP-S2-01_ptubfj.png', 0),
+(46, 'bbngTOP-S1-01', 21, 1, 1, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778749104/bbngTOP-S1-01_nqchvq.png', 0),
+(47, 'bbngTAEY-S2-01', 22, 1, 2, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778749104/bbngTAEY-S2-01_ldeyqe.png', 0),
+(48, 'bbngTAEY-S1-01', 22, 1, 1, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778749104/bbngTAEY-S1-01_lwcnrg.png', 0),
+(49, 'bbngDAES-S2-01', 23, 1, 2, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778749104/bbngDAES-S2-01_xmexpu.png', 0),
+(50, 'bbngDAES-S1-01', 23, 1, 1, 'https://res.cloudinary.com/dplcs6tbo/image/upload/v1778749103/bbngDAES-S1-01_yfs4ux.png', 0)
 ON CONFLICT (idol_card_id) DO NOTHING;
 
 -- Keep SERIAL sequences past explicit seed IDs
