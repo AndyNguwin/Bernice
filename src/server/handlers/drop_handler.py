@@ -18,11 +18,11 @@ async def drop_handler(
             {
                 "title": f"{drop_result.artist_name} {drop_result.idol_name}",
                 "description": (
-                    f"✦ ```{drop_result.public_code}```\n"
-                    f"✦ Type: {drop_result.card_set}\n"
-                    f"✦ Rarity: {drop_result.rarity}\n"
-                    f"✦ In Inventory: {drop_result.quantity}\n"
-                    f"✦ Total printed: {drop_result.total_print_count}"
+                    f"✦ ``{drop_result.public_code}``\n"
+                    f"✦ **Type**: ``{drop_result.card_set}``\n"
+                    f"✦ **Rarity**: ``{drop_result.rarity}``\n"
+                    f"✦ **In Inventory**: ``{drop_result.quantity}``\n"
+                    f"✦ **Total printed**: ``{drop_result.total_print_count}``"
                 ),
                 "image": {
                     "url": drop_result.image_url
