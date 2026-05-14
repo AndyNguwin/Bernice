@@ -1,3 +1,11 @@
+INSERT INTO rarity_rates (rarity, rate) VALUES
+(1, 0.3500),
+(2, 0.3000),
+(3, 0.2000),
+(4, 0.1000),
+(5, 0.0500)
+ON CONFLICT (rarity) DO NOTHING;
+
 -- Initialize artist data
 INSERT INTO artist (artist_id, artist_name) VALUES
 (1, 'NewJeans'),

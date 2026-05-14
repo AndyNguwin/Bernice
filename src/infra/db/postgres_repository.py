@@ -1,10 +1,11 @@
-from typing import List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional
 import os
 from dotenv import load_dotenv
 import asyncpg
 from app.models.idol_card_info import IdolCardInfo
 from app.models.user import User
 from app.models.inventoryCard import InventoryCard, InventoryListItem
+import random
 
 load_dotenv()
 CONNECTION_STR = os.getenv("DATABASE_URL")
@@ -15,6 +16,7 @@ class PostgresRepository:
     def __init__(self):
         self.connection_str = CONNECTION_STR
         self._connection_pool = None
+        self.rarity_rates: Dict[int, float] = {}
 
     async def _make_connection_pool(self) -> None:
         if self._connection_pool is None:
@@ -32,8 +34,39 @@ class PostgresRepository:
             )
         return self._connection_pool
 
+    async def load_rarity_rates(self) -> None:
+        pool = self._check_pool_initialized()
+        async with pool.acquire() as connection:
+            try:
+                rows = await connection.fetch(
+                    """
+                    SELECT rarity, rate
+                    FROM rarity_rates
+                    ORDER BY rarity
+                    """
+                )
+
+                self.rarity_rates = {
+                    row["rarity"]: float(row["rate"])
+                    for row in rows
+                }
+            except Exception as e:
+                raise RuntimeError("Could not load rarity rates", e)
+
     async def get_random_idol_card(self) -> IdolCardInfo:
         pool = self._check_pool_initialized()
+        if not self.rarity_rates:
+            await self.load_rarity_rates()
+
+        rarity = random.choices(
+            population=list(self.rarity_rates.keys()),
+            weights=list(self.rarity_rates.values()),
+            k=1
+        )[0]
+
+        # Temporary fallback while rarities are capped at 3 right now
+        if rarity > 3:
+            rarity = random.choice([2, 3])
 
         async with pool.acquire() as connection:
             try:
@@ -45,8 +78,10 @@ class PostgresRepository:
                     JOIN idol i ON ic.idol_id = i.idol_id
                     JOIN artist a ON i.artist_id = a.artist_id
                     JOIN card_set cs ON ic.card_set_id = cs.card_set_id
+                    WHERE ic.rarity = $1
                     ORDER BY RANDOM() LIMIT 1
-                    """
+                    """,
+                    rarity,
                 )
                 if not row:
                     raise RuntimeError("Could not select a card, check idol_card catalog")

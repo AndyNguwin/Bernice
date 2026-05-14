@@ -46,5 +46,10 @@ CREATE TABLE IF NOT EXISTS user_inventory (
     FOREIGN KEY (idol_card_id) REFERENCES idol_card(idol_card_id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS rarity_rates (
+    rarity INTEGER PRIMARY KEY,
+    rate NUMERIC(5, 4) NOT NULL CHECK (rate >= 0 AND rate <= 1)
+);
+
 CREATE INDEX IF NOT EXISTS idx_user_inventory_user ON user_inventory(user_id);
 CREATE INDEX IF NOT EXISTS idx_idol_card_public_code ON idol_card(public_code);

@@ -18,6 +18,7 @@ async def lifespan(app: FastAPI):
     for attempt in range(1, MAX_ATTEMPTS + 1):
         try:
             await repository._make_connection_pool()
+            await repository.load_rarity_rates()
             app.state.repository = repository
             print("Database connection pool initialized")
             break
