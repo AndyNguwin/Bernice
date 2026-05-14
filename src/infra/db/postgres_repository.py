@@ -97,8 +97,8 @@ class PostgresRepository:
             except Exception as e:
                 raise RuntimeError("Could not select an idol_card", e)
 
-    async def grant_drop(self, user_id: int, idol_card_id: int) -> int:
-        """Increment global print count and add one copy for the user. Returns new total_print_count."""
+    async def grant_drop(self, user_id: int, idol_card_id: int) -> Tuple[int, int]:
+        """Increment print count and user inventory. Returns total_print_count and user's card quantity."""
         pool = self._check_pool_initialized()
 
         async with pool.acquire() as connection:
@@ -126,17 +126,18 @@ class PostgresRepository:
                     if total is None:
                         raise RuntimeError(f"idol_card_id {idol_card_id} not found")
 
-                    await connection.execute(
+                    quantity = await connection.fetchval(
                         """
                         INSERT INTO user_inventory (user_id, idol_card_id, quantity)
                         VALUES ($1, $2, 1)
                         ON CONFLICT (user_id, idol_card_id)
                         DO UPDATE SET quantity = user_inventory.quantity + 1
+                        RETURNING quantity
                         """,
                         user_id,
                         idol_card_id,
                     )
-                return int(total)
+                return int(total), int(quantity)
             except Exception as e:
                 raise RuntimeError("Error while granting drop", e)
 

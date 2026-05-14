@@ -10,3 +10,4 @@ class DropResult:
     rarity: int
     image_url: str
     total_print_count: int
+    quantity: int
