@@ -57,6 +57,7 @@ async def interactions(request: Request, background_tasks: BackgroundTasks):
             command = payload["data"]["name"]
             interaction_name = command
             guild_id = payload["guild_id"]
+            print(f"Guild ID: {guild_id}")
         except (KeyError, TypeError):
             raise HTTPException(400, "Missing field: payload['data']['name']")
 
