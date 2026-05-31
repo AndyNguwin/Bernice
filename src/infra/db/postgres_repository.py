@@ -12,6 +12,10 @@ CONNECTION_STR = os.getenv("DATABASE_URL")
 if not CONNECTION_STR:
     raise SystemExit("No DATABASE_URL in .env")
 
+GUILD = os.getenv("GUILD")
+if not GUILD:
+    GUILD = None
+
 class PostgresRepository:
     def __init__(self):
         self.connection_str = CONNECTION_STR
@@ -53,7 +57,7 @@ class PostgresRepository:
             except Exception as e:
                 raise RuntimeError("Could not load rarity rates", e)
 
-    async def get_random_idol_card(self) -> IdolCardInfo:
+    async def get_random_idol_card(self, guild_id: str = None) -> IdolCardInfo:
         pool = self._check_pool_initialized()
         if not self.rarity_rates:
             await self.load_rarity_rates()
@@ -64,9 +68,16 @@ class PostgresRepository:
             k=1
         )[0]
 
-        # Temporary fallback while rarities are capped at 3 right now
-        if rarity > 3:
+        if rarity == 5:
+            if GUILD and guild_id and guild_id == GUILD and random.random() < 0.20:
+                rarity = 6
+            else:
+                rarity = random.choice([1, 2, 3])
+        elif rarity == 4:
+            # No 4-star cards in the current catalog, route those drops into the existing 1-3 pool
             rarity = random.choice([1, 2, 3])
+
+        # Plan to make 4 stars before 5 stars, temporary solution where I can delete the 4 star branch later on
 
         async with pool.acquire() as connection:
             try:

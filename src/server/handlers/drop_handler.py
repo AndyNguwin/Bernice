@@ -1,7 +1,13 @@
 from app.services.drop import drop_card
 from infra.db.postgres_repository import PostgresRepository
 from infra.discord.client import edit_deferred_message
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
+GUILD = os.getenv("GUILD")
+if not GUILD:
+    GUILD = None
 
 async def drop_handler(
     application_id: str,
@@ -9,8 +15,9 @@ async def drop_handler(
     user_id: int,
     repository: PostgresRepository,
     interaction_id: str | None = None,
+    guild_id: str | None = None,
 ):
-    drop_result = await drop_card(user_id, repository=repository)
+    drop_result = await drop_card(user_id, repository=repository, guild_id=guild_id)
 
     content = {
         "content": f"<@{user_id}>'s drop result!",
